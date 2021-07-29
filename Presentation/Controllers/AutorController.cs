@@ -22,6 +22,23 @@ namespace Presentation.Controllers
         // GET: Autor
         public async Task<IActionResult> Index()
         {
+            //Códigos comentados para demonstrar como visualizar a consulta SQL gerada
+            //var sql = _context
+            //    .Autores
+            //    .OrderBy(x => x.Nome)
+            //    .ToQueryString();
+
+            //var sqlComInclude = _context
+            //    .Autores
+            //    .Include(x => x.Livros)
+            //    .OrderBy(x => x.Nome)
+            //    .ToQueryString();
+
+            //var exemplo = _context
+            //    .Livros
+            //    .Where(x => x.Titulo.Length > 1)
+            //    .ToQueryString();
+
             return View(await _context.Autores.ToListAsync());
         }
 
@@ -33,8 +50,12 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorModel = await _context.Autores
+            var autorModel = await _context
+                .Autores
+                .Include(x => x.Livros)
+                .OrderBy(x => x.Nome)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (autorModel == null)
             {
                 return NotFound();

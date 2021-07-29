@@ -10,5 +10,6 @@ namespace Data.Data
         }
 
         public DbSet<Domain.Model.Models.AutorModel> Autores { get; set; }
+        public DbSet<Domain.Model.Models.LivroModel> Livros { get; set; }
     }
 }

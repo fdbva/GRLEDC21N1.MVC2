@@ -41,6 +41,49 @@
             @Html.DisplayFor(model => model.Nascimento)
         </dd>
     </dl>
+    
+    <table class="table">
+        <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Livros.First().Titulo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Livros.First().Isbn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Livros.First().Lancamento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Livros.First().Autor)
+            </th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.Livros) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Titulo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Isbn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Lancamento)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Autor.Id)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
