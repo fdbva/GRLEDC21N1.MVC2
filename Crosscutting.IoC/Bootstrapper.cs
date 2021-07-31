@@ -1,7 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Data.Data;
+using Data.Repositories;
+using Domain.Model.Interfaces.Repositories;
+using Domain.Model.Interfaces.Services;
+using Domain.Service.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Data.Data;
 
 namespace Crosscutting.IoC
 {
@@ -14,6 +18,9 @@ namespace Crosscutting.IoC
         {
             services.AddDbContext<BibliotecaContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("BibliotecaContext")));
+
+            services.AddTransient<IAutorService, AutorService>();
+            services.AddTransient<IAutorRepository, AutorRepository>();
         }
     }
 }

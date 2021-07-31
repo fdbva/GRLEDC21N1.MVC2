@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Threading.Tasks;
+using Domain.Model.Interfaces.Services;
 using Domain.Model.Models;
-using Data.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Presentation.Controllers
 {
     public class AutorController : Controller
     {
-        private readonly BibliotecaContext _context;
+        private readonly IAutorService _autorService;
 
-        public AutorController(BibliotecaContext context)
+        public AutorController(
+            IAutorService autorService)
         {
-            _context = context;
+            _autorService = autorService;
         }
 
         // GET: Autor
@@ -39,7 +36,8 @@ namespace Presentation.Controllers
             //    .Where(x => x.Titulo.Length > 1)
             //    .ToQueryString();
 
-            return View(await _context.Autores.ToListAsync());
+            //TODO: Consertar para pegar search da View
+            return View(await _autorService.GetAllAsync(true, "lip"));
         }
 
         // GET: Autor/Details/5
@@ -50,11 +48,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorModel = await _context
-                .Autores
-                .Include(x => x.Livros)
-                .OrderBy(x => x.Nome)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var autorModel = await _autorService.GetByIdAsync(id.Value);
 
             if (autorModel == null)
             {
@@ -75,15 +69,16 @@ namespace Presentation.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,UltimoNome,Nacionalidade,QuantidadeLivrosPublicados,Nascimento")] AutorModel autorModel)
+        public async Task<IActionResult> Create(AutorModel autorModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(autorModel);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(autorModel);
             }
-            return View(autorModel);
+
+            var autorCreated = await _autorService.CreateAsync(autorModel);
+
+            return RedirectToAction(nameof(Details), new { id = autorCreated.Id });
         }
 
         // GET: Autor/Edit/5
@@ -94,7 +89,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorModel = await _context.Autores.FindAsync(id);
+            var autorModel = await _autorService.GetByIdAsync(id.Value);
             if (autorModel == null)
             {
                 return NotFound();
@@ -107,7 +102,7 @@ namespace Presentation.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,UltimoNome,Nacionalidade,QuantidadeLivrosPublicados,Nascimento")] AutorModel autorModel)
+        public async Task<IActionResult> Edit(int id, AutorModel autorModel)
         {
             if (id != autorModel.Id)
             {
@@ -118,12 +113,12 @@ namespace Presentation.Controllers
             {
                 try
                 {
-                    _context.Update(autorModel);
-                    await _context.SaveChangesAsync();
+                    await _autorService.EditAsync(autorModel);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException) //TODO: Tratamento de erro de banco deve ser feito no Repository
                 {
-                    if (!AutorModelExists(autorModel.Id))
+                    var exists = await AutorModelExistsAsync(autorModel.Id);
+                    if (!exists)
                     {
                         return NotFound();
                     }
@@ -145,8 +140,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorModel = await _context.Autores
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var autorModel = await _autorService.GetByIdAsync(id.Value);
             if (autorModel == null)
             {
                 return NotFound();
@@ -160,15 +154,18 @@ namespace Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var autorModel = await _context.Autores.FindAsync(id);
-            _context.Autores.Remove(autorModel);
-            await _context.SaveChangesAsync();
+            await _autorService.DeleteAsync(id);
+
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AutorModelExists(int id)
+        private async Task<bool> AutorModelExistsAsync(int id)
         {
-            return _context.Autores.Any(e => e.Id == id);
+            var autor = await _autorService.GetByIdAsync(id);
+
+            var any = autor != null;
+
+            return any;
         }
     }
 }

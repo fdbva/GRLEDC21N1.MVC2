@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data.Data
 {
@@ -7,6 +8,16 @@ namespace Data.Data
         public BibliotecaContext (DbContextOptions<BibliotecaContext> options)
             : base(options)
         {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder
+                .LogTo(Console.WriteLine)
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors();
+
+            base.OnConfiguring(optionsBuilder);
         }
 
         public DbSet<Domain.Model.Models.AutorModel> Autores { get; set; }
