@@ -118,27 +118,28 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    await _autorService.EditAsync(autorModel);
-                }
-                catch (DbUpdateConcurrencyException) //TODO: Tratamento de erro de banco deve ser feito no Repository
-                {
-                    var exists = await AutorModelExistsAsync(autorModel.Id);
-                    if (!exists)
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return View(autorModel);
             }
-            return View(autorModel);
+
+            try
+            {
+                await _autorService.EditAsync(autorModel);
+            }
+            catch (DbUpdateConcurrencyException) //TODO: Tratamento de erro de banco deve ser feito no Repository
+            {
+                var exists = await AutorModelExistsAsync(autorModel.Id);
+                if (!exists)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Autor/Delete/5
