@@ -3,6 +3,7 @@ using Domain.Model.Interfaces.Services;
 using Domain.Model.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Models;
 
 namespace Presentation.Controllers
 {
@@ -17,7 +18,7 @@ namespace Presentation.Controllers
         }
 
         // GET: Autor
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(AutorIndexViewModel autorIndexRequest)
         {
             //Códigos comentados para demonstrar como visualizar a consulta SQL gerada
             //var sql = _context
@@ -36,8 +37,16 @@ namespace Presentation.Controllers
             //    .Where(x => x.Titulo.Length > 1)
             //    .ToQueryString();
 
-            //TODO: Consertar para pegar search da View
-            return View(await _autorService.GetAllAsync(true, "lip"));
+            var autorIndexViewModel = new AutorIndexViewModel
+            {
+                Search = autorIndexRequest.Search,
+                OrderAscendant = autorIndexRequest.OrderAscendant,
+                Autores = await _autorService.GetAllAsync(
+                    autorIndexRequest.OrderAscendant,
+                    autorIndexRequest.Search)
+            };
+
+            return View(autorIndexViewModel);
         }
 
         // GET: Autor/Details/5

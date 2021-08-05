@@ -21,6 +21,8 @@ namespace Crosscutting.IoC
 
             services.AddTransient<IAutorService, AutorService>();
             services.AddTransient<IAutorRepository, AutorRepository>();
+            services.AddTransient<ILivroService, LivroService>();
+            services.AddTransient<ILivroRepository, LivroRepository>();
         }
     }
 }
