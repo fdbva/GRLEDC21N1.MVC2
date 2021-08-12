@@ -13,5 +13,6 @@ namespace Domain.Model.Interfaces.Services
         Task<LivroModel> CreateAsync(LivroModel livroModel);
         Task<LivroModel> EditAsync(LivroModel livroModel);
         Task DeleteAsync(int id);
+        Task<bool> IsIsbnValidAsync(string isbn, int id);
     }
 }

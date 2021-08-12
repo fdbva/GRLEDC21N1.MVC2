@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Domain.Model.Interfaces.Services;
-using Domain.Model.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Models;
@@ -20,23 +19,6 @@ namespace Presentation.Controllers
         // GET: Autor
         public async Task<IActionResult> Index(AutorIndexViewModel autorIndexRequest)
         {
-            //Códigos comentados para demonstrar como visualizar a consulta SQL gerada
-            //var sql = _context
-            //    .Autores
-            //    .OrderBy(x => x.Nome)
-            //    .ToQueryString();
-
-            //var sqlComInclude = _context
-            //    .Autores
-            //    .Include(x => x.Livros)
-            //    .OrderBy(x => x.Nome)
-            //    .ToQueryString();
-
-            //var exemplo = _context
-            //    .Livros
-            //    .Where(x => x.Titulo.Length > 1)
-            //    .ToQueryString();
-
             var autorIndexViewModel = new AutorIndexViewModel
             {
                 Search = autorIndexRequest.Search,
@@ -64,7 +46,9 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            return View(autorModel);
+            var autorViewModel = AutorViewModel.From(autorModel);
+
+            return View(autorViewModel);
         }
 
         // GET: Autor/Create
@@ -78,13 +62,14 @@ namespace Presentation.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AutorModel autorModel)
+        public async Task<IActionResult> Create(AutorViewModel autorViewModel)
         {
             if (!ModelState.IsValid)
             {
-                return View(autorModel);
+                return View(autorViewModel);
             }
 
+            var autorModel = autorViewModel.ToModel();
             var autorCreated = await _autorService.CreateAsync(autorModel);
 
             return RedirectToAction(nameof(Details), new { id = autorCreated.Id });
@@ -103,7 +88,9 @@ namespace Presentation.Controllers
             {
                 return NotFound();
             }
-            return View(autorModel);
+
+            var autorViewModel = AutorViewModel.From(autorModel);
+            return View(autorViewModel);
         }
 
         // POST: Autor/Edit/5
@@ -111,18 +98,19 @@ namespace Presentation.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, AutorModel autorModel)
+        public async Task<IActionResult> Edit(int id, AutorViewModel autorViewModel)
         {
-            if (id != autorModel.Id)
+            if (id != autorViewModel.Id)
             {
                 return NotFound();
             }
 
             if (!ModelState.IsValid)
             {
-                return View(autorModel);
+                return View(autorViewModel);
             }
 
+            var autorModel = autorViewModel.ToModel();
             try
             {
                 await _autorService.EditAsync(autorModel);
@@ -156,7 +144,8 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            return View(autorModel);
+            var autorViewModel = AutorViewModel.From(autorModel);
+            return View(autorViewModel);
         }
 
         // POST: Autor/Delete/5

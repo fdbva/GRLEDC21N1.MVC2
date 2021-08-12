@@ -13,5 +13,6 @@ namespace Domain.Model.Interfaces.Repositories
         Task<LivroModel> CreateAsync(LivroModel livroModel);
         Task<LivroModel> EditAsync(LivroModel livroModel);
         Task DeleteAsync(int id);
+        Task<LivroModel> GetIsbnNotFromThisIdAsync(string isbn, int id);
     }
 }

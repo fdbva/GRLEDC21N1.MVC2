@@ -51,7 +51,8 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            return View(livroModel);
+            var livroViewModel = LivroViewModel.From(livroModel);
+            return View(livroViewModel);
         }
 
         // GET: Livro/Create
@@ -67,15 +68,15 @@ namespace Presentation.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(LivroModel livroModel)
+        public async Task<IActionResult> Create(LivroViewModel livroViewModel)
         {
             if (!ModelState.IsValid)
             {
-                await PreencherSelectAutores(livroModel.AutorId);
-
-                return View(livroModel);
+                await PreencherSelectAutores(livroViewModel.AutorId);
+                return View(livroViewModel);
             }
 
+            var livroModel = livroViewModel.ToModel();
             var livroCreated = await _livroService.CreateAsync(livroModel);
 
             return RedirectToAction(nameof(Details), new { id = livroCreated.Id });
@@ -108,7 +109,8 @@ namespace Presentation.Controllers
 
             await PreencherSelectAutores(livroModel.AutorId);
 
-            return View(livroModel);
+            var livroViewModel = LivroViewModel.From(livroModel);
+            return View(livroViewModel);
         }
 
         // POST: Livro/Edit/5
@@ -116,20 +118,21 @@ namespace Presentation.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, LivroModel livroModel)
+        public async Task<IActionResult> Edit(int id, LivroViewModel livroViewModel)
         {
-            if (id != livroModel.Id)
+            if (id != livroViewModel.Id)
             {
                 return NotFound();
             }
 
             if (!ModelState.IsValid)
             {
-                await PreencherSelectAutores(livroModel.AutorId);
+                await PreencherSelectAutores(livroViewModel.AutorId);
 
-                return View(livroModel);
+                return View(livroViewModel);
             }
 
+            var livroModel = livroViewModel.ToModel();
             try
             {
                 await _livroService.EditAsync(livroModel);
@@ -163,7 +166,8 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            return View(livroModel);
+            var livroViewModel = LivroViewModel.From(livroModel);
+            return View(livroViewModel);
         }
 
         // POST: Livro/Delete/5
@@ -183,6 +187,14 @@ namespace Presentation.Controllers
             var any = livro != null;
 
             return any;
+        }
+
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> IsIsbnValid(string isbn, int id)
+        {
+            return await _livroService.IsIsbnValidAsync(isbn, id) 
+                ? Json(true)
+                : Json($"ISBN {isbn} já está sendo usado.");
         }
     }
 }

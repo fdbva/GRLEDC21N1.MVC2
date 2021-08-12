@@ -70,5 +70,14 @@ namespace Data.Repositories
 
             await _bibliotecaContext.SaveChangesAsync();
         }
+
+        public async Task<LivroModel> GetIsbnNotFromThisIdAsync(string isbn, int id)
+        {
+            var livroModel = await _bibliotecaContext
+                .Livros
+                .FirstOrDefaultAsync(x => x.Isbn == isbn && x.Id != id);
+
+            return livroModel;
+        }
     }
 }
