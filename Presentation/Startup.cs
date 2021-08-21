@@ -20,6 +20,16 @@ namespace Presentation
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+                
+            services
+                .AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    var googleAuthNSection = Configuration.GetSection("Authentication:Google");
+
+                    options.ClientId = googleAuthNSection["ClientId"];
+                    options.ClientSecret = googleAuthNSection["ClientSecret"];
+                });
 
             services.RegisterServices(Configuration);
         }
