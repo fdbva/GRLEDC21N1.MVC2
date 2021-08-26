@@ -7,8 +7,8 @@ dotnet tool install --global dotnet-ef --version 5.0.8
 #Migrations para BibliotecaContext
 Executados na pasta do projeto Data:
 ```powershell
-dotnet ef migrations add Initial --context BibliotecaContext --startup-project ..\Presentation\Presentation.csproj
-dotnet ef database update --context BibliotecaContext --startup-project ..\Presentation\Presentation.csproj
+dotnet ef migrations add Initial --context BibliotecaContext --startup-project ..\Application.WebApi\Application.WebApi.csproj
+dotnet ef database update --context BibliotecaContext --startup-project ..\Application.WebApi\Application.WebApi.csproj
 ```
 
 #Migrations para o LoginContext
