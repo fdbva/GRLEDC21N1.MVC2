@@ -1,9 +1,10 @@
-using Crosscutting.IoC;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Presentation.Services;
+using Presentation.Services.Implementations;
 
 namespace Presentation
 {
@@ -31,7 +32,9 @@ namespace Presentation
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
                 });
 
-            services.RegisterServices(Configuration);
+            //services.RegisterServices(Configuration);
+            services.AddTransient<IAutorHttpService, AutorFakeService>();
+            services.AddTransient<ILivroHttpService, LivroFakeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

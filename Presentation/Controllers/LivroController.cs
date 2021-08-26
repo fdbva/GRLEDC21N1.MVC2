@@ -1,24 +1,23 @@
 ﻿using System.Threading.Tasks;
-using Domain.Model.Interfaces.Services;
-using Domain.Model.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Models;
+using Presentation.Services;
 
 namespace Presentation.Controllers
 {
     public class LivroController : Controller
     {
-        private readonly ILivroService _livroService;
-        private readonly IAutorService _autorService;
+        private readonly ILivroHttpService _livroHttpService;
+        private readonly IAutorHttpService _autorHttpService;
 
         public LivroController(
-            ILivroService livroService,
-            IAutorService autorService)
+            ILivroHttpService livroHttpService,
+            IAutorHttpService autorHttpService)
         {
-            _livroService = livroService;
-            _autorService = autorService;
+            _livroHttpService = livroHttpService;
+            _autorHttpService = autorHttpService;
         }
 
         // GET: Livro
@@ -29,7 +28,7 @@ namespace Presentation.Controllers
             {
                 Search = livroIndexRequest.Search,
                 OrderAscendant = livroIndexRequest.OrderAscendant,
-                Livros = await _livroService.GetAllAsync(
+                Livros = await _livroHttpService.GetAllAsync(
                     livroIndexRequest.OrderAscendant,
                     livroIndexRequest.Search)
             };
@@ -44,14 +43,13 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var livroModel = await _livroService.GetByIdAsync(id.Value);
+            var livroViewModel = await _livroHttpService.GetByIdAsync(id.Value);
 
-            if (livroModel == null)
+            if (livroViewModel == null)
             {
                 return NotFound();
             }
 
-            var livroViewModel = LivroViewModel.From(livroModel);
             return View(livroViewModel);
         }
 
@@ -76,20 +74,19 @@ namespace Presentation.Controllers
                 return View(livroViewModel);
             }
 
-            var livroModel = livroViewModel.ToModel();
-            var livroCreated = await _livroService.CreateAsync(livroModel);
+            var livroCreated = await _livroHttpService.CreateAsync(livroViewModel);
 
             return RedirectToAction(nameof(Details), new { id = livroCreated.Id });
         }
 
         private async Task PreencherSelectAutores(int? autorId = null)
         {
-            var autores = await _autorService.GetAllAsync(true);
+            var autores = await _autorHttpService.GetAllAsync(true);
 
             ViewBag.Autores = new SelectList(
                 autores,
-                nameof(AutorModel.Id),
-                nameof(AutorModel.Nome),
+                nameof(AutorViewModel.Id),
+                nameof(AutorViewModel.Nome),
                 autorId);
         }
 
@@ -101,15 +98,16 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var livroModel = await _livroService.GetByIdAsync(id.Value);
-            if (livroModel == null)
+            var livroViewModel = await _livroHttpService.GetByIdAsync(id.Value);
+            if (livroViewModel == null)
             {
                 return NotFound();
             }
 
-            await PreencherSelectAutores(livroModel.AutorId);
 
-            var livroViewModel = LivroViewModel.From(livroModel);
+
+            await PreencherSelectAutores(livroViewModel.AutorId);
+
             return View(livroViewModel);
         }
 
@@ -132,14 +130,13 @@ namespace Presentation.Controllers
                 return View(livroViewModel);
             }
 
-            var livroModel = livroViewModel.ToModel();
             try
             {
-                await _livroService.EditAsync(livroModel);
+                await _livroHttpService.EditAsync(livroViewModel);
             }
             catch (DbUpdateConcurrencyException) //TODO: Tratamento de erro de banco deve ser feito no Repository
             {
-                var exists = await LivroModelExistsAsync(livroModel.Id);
+                var exists = await LivroViewModelExistsAsync(livroViewModel.Id);
                 if (!exists)
                 {
                     return NotFound();
@@ -160,13 +157,12 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var livroModel = await _livroService.GetByIdAsync(id.Value);
-            if (livroModel == null)
+            var livroViewModel = await _livroHttpService.GetByIdAsync(id.Value);
+            if (livroViewModel == null)
             {
                 return NotFound();
             }
 
-            var livroViewModel = LivroViewModel.From(livroModel);
             return View(livroViewModel);
         }
 
@@ -175,14 +171,14 @@ namespace Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _livroService.DeleteAsync(id);
+            await _livroHttpService.DeleteAsync(id);
 
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<bool> LivroModelExistsAsync(int id)
+        private async Task<bool> LivroViewModelExistsAsync(int id)
         {
-            var livro = await _livroService.GetByIdAsync(id);
+            var livro = await _livroHttpService.GetByIdAsync(id);
 
             var any = livro != null;
 
@@ -192,7 +188,7 @@ namespace Presentation.Controllers
         [AcceptVerbs("GET", "POST")]
         public async Task<IActionResult> IsIsbnValid(string isbn, int id)
         {
-            return await _livroService.IsIsbnValidAsync(isbn, id) 
+            return await _livroHttpService.IsIsbnValidAsync(isbn, id) 
                 ? Json(true)
                 : Json($"ISBN {isbn} já está sendo usado.");
         }

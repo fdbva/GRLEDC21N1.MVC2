@@ -1,19 +1,19 @@
 ﻿using System.Threading.Tasks;
-using Domain.Model.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Models;
+using Presentation.Services;
 
 namespace Presentation.Controllers
 {
     public class AutorController : Controller
     {
-        private readonly IAutorService _autorService;
+        private readonly IAutorHttpService _autorHttpService;
 
         public AutorController(
-            IAutorService autorService)
+            IAutorHttpService autorHttpService)
         {
-            _autorService = autorService;
+            _autorHttpService = autorHttpService;
         }
 
         // GET: Autor
@@ -23,7 +23,7 @@ namespace Presentation.Controllers
             {
                 Search = autorIndexRequest.Search,
                 OrderAscendant = autorIndexRequest.OrderAscendant,
-                Autores = await _autorService.GetAllAsync(
+                Autores = await _autorHttpService.GetAllAsync(
                     autorIndexRequest.OrderAscendant,
                     autorIndexRequest.Search)
             };
@@ -39,14 +39,12 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorModel = await _autorService.GetByIdAsync(id.Value);
+            var autorViewModel = await _autorHttpService.GetByIdAsync(id.Value);
 
-            if (autorModel == null)
+            if (autorViewModel == null)
             {
                 return NotFound();
             }
-
-            var autorViewModel = AutorViewModel.From(autorModel);
 
             return View(autorViewModel);
         }
@@ -69,8 +67,7 @@ namespace Presentation.Controllers
                 return View(autorViewModel);
             }
 
-            var autorModel = autorViewModel.ToModel();
-            var autorCreated = await _autorService.CreateAsync(autorModel);
+            var autorCreated = await _autorHttpService.CreateAsync(autorViewModel);
 
             return RedirectToAction(nameof(Details), new { id = autorCreated.Id });
         }
@@ -83,13 +80,12 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorModel = await _autorService.GetByIdAsync(id.Value);
-            if (autorModel == null)
+            var autorViewModel = await _autorHttpService.GetByIdAsync(id.Value);
+            if (autorViewModel == null)
             {
                 return NotFound();
             }
-
-            var autorViewModel = AutorViewModel.From(autorModel);
+            
             return View(autorViewModel);
         }
 
@@ -109,15 +105,14 @@ namespace Presentation.Controllers
             {
                 return View(autorViewModel);
             }
-
-            var autorModel = autorViewModel.ToModel();
+            
             try
             {
-                await _autorService.EditAsync(autorModel);
+                await _autorHttpService.EditAsync(autorViewModel);
             }
             catch (DbUpdateConcurrencyException) //TODO: Tratamento de erro de banco deve ser feito no Repository
             {
-                var exists = await AutorModelExistsAsync(autorModel.Id);
+                var exists = await AutorModelExistsAsync(autorViewModel.Id);
                 if (!exists)
                 {
                     return NotFound();
@@ -138,13 +133,12 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorModel = await _autorService.GetByIdAsync(id.Value);
-            if (autorModel == null)
+            var autorViewModel = await _autorHttpService.GetByIdAsync(id.Value);
+            if (autorViewModel == null)
             {
                 return NotFound();
             }
-
-            var autorViewModel = AutorViewModel.From(autorModel);
+            
             return View(autorViewModel);
         }
 
@@ -153,14 +147,14 @@ namespace Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _autorService.DeleteAsync(id);
+            await _autorHttpService.DeleteAsync(id);
 
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> AutorModelExistsAsync(int id)
         {
-            var autor = await _autorService.GetByIdAsync(id);
+            var autor = await _autorHttpService.GetByIdAsync(id);
 
             var any = autor != null;
 
