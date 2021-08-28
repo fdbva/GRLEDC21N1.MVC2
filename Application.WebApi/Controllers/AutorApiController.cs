@@ -74,15 +74,15 @@ namespace Application.WebApi.Controllers
 
             try
             {
-                await _autorService.EditAsync(autorModel);
+                var autorEdited = await _autorService.EditAsync(autorModel);
+
+                return Ok(autorEdited);
             }
             catch (DbUpdateConcurrencyException) //TODO: Tratamento de erro de banco deve ser feito no Repository
             {
                 //Pode ser bem melhorado
                 return StatusCode(409);
             }
-
-            return Ok();
         }
 
         [HttpDelete("{id}")]

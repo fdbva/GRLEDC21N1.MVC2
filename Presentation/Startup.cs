@@ -33,8 +33,8 @@ namespace Presentation
                 });
 
             //services.RegisterServices(Configuration);
-            services.AddTransient<IAutorHttpService, AutorFakeService>();
-            services.AddTransient<ILivroHttpService, LivroFakeService>();
+            services.AddTransient<IAutorHttpService, AutorHttpService>();
+            services.AddTransient<ILivroHttpService, LivroHttpService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

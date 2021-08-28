@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Presentation.Models;
 
@@ -9,34 +10,78 @@ namespace Presentation.Services.Implementations
 {
     public class LivroHttpService : ILivroHttpService
     {
-        public Task<LivroViewModel> CreateAsync(LivroViewModel livroViewModel)
+        private readonly HttpClient _httpClient;
+
+        private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
-            throw new NotImplementedException();
+            IgnoreNullValues = true,
+            PropertyNameCaseInsensitive = true
+        };
+
+        public LivroHttpService()
+        {
+            _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri("https://localhost:44395/");
         }
 
-        public Task DeleteAsync(int id)
+        public async Task<LivroViewModel> CreateAsync(LivroViewModel livroViewModel)
         {
-            throw new NotImplementedException();
+            var httpResponseMessage = await _httpClient
+                .PostAsJsonAsync("api/v1/LivroApi", livroViewModel);
+
+            var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+
+            var livroCreated = await JsonSerializer
+                .DeserializeAsync<LivroViewModel>(contentStream, JsonSerializerOptions);
+
+            return livroCreated;
         }
 
-        public Task<LivroViewModel> EditAsync(LivroViewModel livroViewModel)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var httpResponseMessage = await _httpClient
+                .DeleteAsync($"api/v1/LivroApi/{id}");
+
+            httpResponseMessage.EnsureSuccessStatusCode();
         }
 
-        public Task<IEnumerable<LivroViewModel>> GetAllAsync(bool orderAscendant, string search = null)
+        public async Task<LivroViewModel> EditAsync(LivroViewModel livroViewModel)
         {
-            throw new NotImplementedException();
+            var httpResponseMessage = await _httpClient
+                .PutAsJsonAsync($"api/v1/LivroApi/{livroViewModel.Id}", livroViewModel);
+
+            httpResponseMessage.EnsureSuccessStatusCode();
+
+            var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+
+            var livroEdited = await JsonSerializer
+                .DeserializeAsync<LivroViewModel>(contentStream, JsonSerializerOptions);
+
+            return livroEdited;
         }
 
-        public Task<LivroViewModel> GetByIdAsync(int id)
+        public async Task<IEnumerable<LivroViewModel>> GetAllAsync(bool orderAscendant, string search = null)
         {
-            throw new NotImplementedException();
+            var livros = await _httpClient
+                .GetFromJsonAsync<IEnumerable<LivroViewModel>>("/api/v1/LivroApi/");
+
+            return livros;
         }
 
-        public Task<bool> IsIsbnValidAsync(string isbn, int id)
+        public async Task<LivroViewModel> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var livros = await _httpClient
+                .GetFromJsonAsync<LivroViewModel>($"/api/v1/LivroApi/{id}");
+
+            return livros;
+        }
+
+        public async Task<bool> IsIsbnValidAsync(string isbn, int id)
+        {
+            var isIsbnValid = await _httpClient
+                .GetFromJsonAsync<bool>($"/api/v1/LivroApi/IsIsbnValid/{isbn}/{id}");
+
+            return isIsbnValid;
         }
     }
 }

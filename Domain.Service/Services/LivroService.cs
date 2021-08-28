@@ -43,6 +43,11 @@ namespace Domain.Service.Services
 
         public async Task<bool> IsIsbnValidAsync(string isbn, int id)
         {
+            if (string.IsNullOrWhiteSpace(isbn))
+            {
+                return false;
+            }
+
             var livroModel = await _livroRepository.GetIsbnNotFromThisIdAsync(isbn, id);
 
             return livroModel == null;

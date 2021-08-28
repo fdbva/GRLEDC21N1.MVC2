@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Models;
@@ -85,7 +86,7 @@ namespace Presentation.Controllers
             {
                 return NotFound();
             }
-            
+
             return View(autorViewModel);
         }
 
@@ -105,7 +106,7 @@ namespace Presentation.Controllers
             {
                 return View(autorViewModel);
             }
-            
+
             try
             {
                 await _autorHttpService.EditAsync(autorViewModel);
@@ -138,7 +139,7 @@ namespace Presentation.Controllers
             {
                 return NotFound();
             }
-            
+
             return View(autorViewModel);
         }
 
