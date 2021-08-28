@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -32,9 +33,13 @@ namespace Presentation
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
                 });
 
-            //services.RegisterServices(Configuration);
-            services.AddTransient<IAutorHttpService, AutorHttpService>();
-            services.AddTransient<ILivroHttpService, LivroHttpService>();
+            var autorAddress = Configuration.GetValue<string>("ApiAddresses:Autor");
+            var livroAddress = Configuration.GetValue<string>("ApiAddresses:Livro");
+
+            services.AddHttpClient<IAutorHttpService, AutorHttpService>(x =>
+                x.BaseAddress = new Uri(autorAddress));
+            services.AddHttpClient<ILivroHttpService, LivroHttpService>(x =>
+                x.BaseAddress = new Uri(livroAddress));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

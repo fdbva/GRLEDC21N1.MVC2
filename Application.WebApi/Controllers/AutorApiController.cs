@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Model.Interfaces.Services;
 using Domain.Model.Models;
@@ -20,15 +19,17 @@ namespace Application.WebApi.Controllers
             _autorService = autorService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<AutorModel>>> Get()//TODO: adicionar parâmetros de filtro
+        [HttpGet("{orderAscendant:bool}/{search?}")]
+        public async Task<ActionResult<IEnumerable<AutorModel>>> Get(
+            bool orderAscendant,
+            string search = null)
         {
-            var autores = await _autorService.GetAllAsync(orderAscendant: true);
+            var autores = await _autorService.GetAllAsync(orderAscendant, search);
 
             return Ok(autores);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<AutorModel>> Get(int id)
         {
             if (id <= 0)
@@ -59,7 +60,7 @@ namespace Application.WebApi.Controllers
             return Ok(autorCreated);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<ActionResult<AutorModel>> Put(int id, [FromBody] AutorModel autorModel)
         {
             if (id != autorModel.Id)
@@ -85,7 +86,7 @@ namespace Application.WebApi.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
             if (id <= 0)

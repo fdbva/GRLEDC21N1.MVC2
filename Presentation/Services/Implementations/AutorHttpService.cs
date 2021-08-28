@@ -18,18 +18,18 @@ namespace Presentation.Services.Implementations
             PropertyNameCaseInsensitive = true
         };
 
-        public AutorHttpService()
+        public AutorHttpService(
+            HttpClient httpClient)
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("https://localhost:44395/");
+            _httpClient = httpClient;
         }
 
         public async Task<AutorViewModel> CreateAsync(AutorViewModel autorViewModel)
         {
             var httpResponseMessage = await _httpClient
-                .PostAsJsonAsync("/api/v1/AutorApi", autorViewModel);
+                .PostAsJsonAsync(string.Empty, autorViewModel);
 
-            var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            await using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
 
             var autorCreated = await JsonSerializer
                 .DeserializeAsync<AutorViewModel>(contentStream, JsonSerializerOptions);
@@ -40,7 +40,7 @@ namespace Presentation.Services.Implementations
         public async Task DeleteAsync(int id)
         {
             var httpResponseMessage = await _httpClient
-                .DeleteAsync($"/api/v1/AutorApi/{id}");
+                .DeleteAsync($"{id}");
 
             httpResponseMessage.EnsureSuccessStatusCode();
         }
@@ -48,11 +48,11 @@ namespace Presentation.Services.Implementations
         public async Task<AutorViewModel> EditAsync(AutorViewModel autorViewModel)
         {
             var httpResponseMessage = await _httpClient
-                .PutAsJsonAsync($"/api/v1/AutorApi/{autorViewModel.Id}", autorViewModel);
+                .PutAsJsonAsync($"{autorViewModel.Id}", autorViewModel);
 
             httpResponseMessage.EnsureSuccessStatusCode();
 
-            var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            await using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
 
             var autorEdited = await JsonSerializer
                 .DeserializeAsync<AutorViewModel>(contentStream, JsonSerializerOptions);
@@ -63,7 +63,7 @@ namespace Presentation.Services.Implementations
         public async Task<IEnumerable<AutorViewModel>> GetAllAsync(bool orderAscendant, string search = null)
         {
             var autores = await _httpClient
-                .GetFromJsonAsync<IEnumerable<AutorViewModel>>("/api/v1/AutorApi/");
+                .GetFromJsonAsync<IEnumerable<AutorViewModel>>($"{orderAscendant}/{search}");
 
             return autores;
         }
@@ -71,7 +71,7 @@ namespace Presentation.Services.Implementations
         public async Task<AutorViewModel> GetByIdAsync(int id)
         {
             var autores = await _httpClient
-                .GetFromJsonAsync<AutorViewModel>($"/api/v1/AutorApi/{id}");
+                .GetFromJsonAsync<AutorViewModel>($"{id}");
 
             return autores;
         }

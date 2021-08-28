@@ -26,10 +26,13 @@ namespace Data.Repositories
 
             if (string.IsNullOrWhiteSpace(search))
             {
-                return await livros.ToListAsync();
+                return await livros
+                    .Include(x => x.Autor)
+                    .ToListAsync();
             }
 
             return await livros
+                .Include(x => x.Autor)
                 .Where(x => x.Titulo.Contains(search))
                 .ToListAsync();
         }

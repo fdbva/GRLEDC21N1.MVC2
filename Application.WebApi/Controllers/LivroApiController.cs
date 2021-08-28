@@ -22,12 +22,15 @@ namespace Application.WebApi.Controllers
             _livroService = livroService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<LivroModel>>> Get()//TODO: adicionar parâmetros de filtro
+        [HttpGet("{orderAscendant:bool}/{search?}")]
+        public async Task<ActionResult<IEnumerable<LivroModel>>> Get(
+            bool orderAscendant,
+            string search = null)
         {
-            var livroes = await _livroService.GetAllAsync(orderAscendant: true);
+            var livros = await _livroService
+                .GetAllAsync(orderAscendant, search);
 
-            return Ok(livroes);
+            return Ok(livros);
         }
 
         [HttpGet("{id}")]

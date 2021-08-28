@@ -21,6 +21,8 @@ namespace Presentation.Models
         [Required]
         public DateTime Nascimento { get; set; }
 
+        public string NomeCompleto => $"{Id} - {Nome} {UltimoNome}";
+
         public List<LivroViewModel> Livros { get; set; }
     }
 }
