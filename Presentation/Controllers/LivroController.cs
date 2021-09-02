@@ -86,7 +86,7 @@ namespace Presentation.Controllers
             ViewBag.Autores = new SelectList(
                 autores,
                 nameof(AutorViewModel.Id),
-                nameof(AutorViewModel.Nome),
+                nameof(AutorViewModel.NomeCompleto),
                 autorId);
         }
 
@@ -103,8 +103,6 @@ namespace Presentation.Controllers
             {
                 return NotFound();
             }
-
-
 
             await PreencherSelectAutores(livroViewModel.AutorId);
 

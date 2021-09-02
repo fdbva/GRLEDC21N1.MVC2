@@ -20,26 +20,52 @@ namespace Data.Repositories
 
         public async Task<IEnumerable<AutorModel>> GetAllAsync(bool orderAscendant, string search = null)
         {
-            var autores = orderAscendant
-                ? _bibliotecaContext.Autores.OrderBy(x => x.Nome)
-                : _bibliotecaContext.Autores.OrderByDescending(x => x.Nome);
+            var autores = _bibliotecaContext.Autores.AsQueryable();
 
-            if (string.IsNullOrWhiteSpace(search))
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                return await autores.ToListAsync();
+                autores = autores
+                    .Where(x => x.Nome.Contains(search) || x.UltimoNome.Contains(search));
             }
 
-            return await autores
-                .Where(x=> x.Nome.Contains(search) || x.UltimoNome.Contains(search))
+            autores = orderAscendant
+                ? autores.OrderBy(x => x.Nome)
+                : autores.OrderByDescending(x => x.Nome);
+
+            var result = await autores
+                .Select(x => new
+                {
+                    Autor = x,
+                    QtdLivros = x.Livros.Count
+                })
                 .ToListAsync();
+
+            var autoresResult = result
+                .Select(x =>
+                {
+                    x.Autor.QuantidadeLivrosPublicados = x.QtdLivros;
+                    return x.Autor;
+                });
+
+            return autoresResult;
         }
 
         public async Task<AutorModel> GetByIdAsync(int id)
         {
-            var autor = await _bibliotecaContext
+            var autorTask = _bibliotecaContext
                 .Autores
                 .Include(x => x.Livros)
                 .FirstOrDefaultAsync(x => x.Id == id);
+
+            var qtdLivrosTask = _bibliotecaContext.Livros.CountAsync(x => x.AutorId == id);
+
+            await Task.WhenAll(autorTask, qtdLivrosTask);
+            //Também pode ser solucionado de maneira similar ao GetAll
+            //Fizemos durante a aula a outra maneira
+
+            var autor = await autorTask;
+
+            autor.QuantidadeLivrosPublicados = await qtdLivrosTask;
 
             return autor;
         }

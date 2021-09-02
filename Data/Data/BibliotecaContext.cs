@@ -1,4 +1,5 @@
 ﻿using System;
+using Domain.Model.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Data
@@ -18,6 +19,15 @@ namespace Data.Data
                 .EnableDetailedErrors();
 
             base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .Entity<AutorModel>()
+                .Ignore(x => x.QuantidadeLivrosPublicados);
+
+            base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Domain.Model.Models.AutorModel> Autores { get; set; }
