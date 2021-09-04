@@ -35,11 +35,14 @@ namespace Presentation
 
             var autorAddress = Configuration.GetValue<string>("ApiAddresses:Autor");
             var livroAddress = Configuration.GetValue<string>("ApiAddresses:Livro");
+            var estatisticaAddress = Configuration.GetValue<string>("ApiAddresses:Estatistica");
 
             services.AddHttpClient<IAutorHttpService, AutorHttpService>(x =>
                 x.BaseAddress = new Uri(autorAddress));
             services.AddHttpClient<ILivroHttpService, LivroHttpService>(x =>
                 x.BaseAddress = new Uri(livroAddress));
+            services.AddHttpClient<IEstatisticaHttpService, EstatisticaHttpService>(x =>
+                x.BaseAddress = new Uri(estatisticaAddress));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

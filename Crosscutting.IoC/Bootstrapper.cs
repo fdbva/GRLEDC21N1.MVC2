@@ -23,6 +23,8 @@ namespace Crosscutting.IoC
             services.AddTransient<IAutorRepository, AutorRepository>();
             services.AddTransient<ILivroService, LivroService>();
             services.AddTransient<ILivroRepository, LivroRepository>();
+            services.AddTransient<IEstatisticaService, EstatisticaService>();
+            services.AddTransient<IEstatisticaRepository, EstatisticaRepository>();
         }
     }
 }

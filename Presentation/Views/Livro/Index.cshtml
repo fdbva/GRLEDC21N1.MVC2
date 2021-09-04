@@ -41,6 +41,9 @@
                 @Html.DisplayNameFor(model => model.Livros.First().Lancamento)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Livros.First().QtdPaginas)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Livros.First().Autor)
             </th>
             <th></th>
@@ -49,25 +52,28 @@
     <tbody>
         @foreach (var item in Model.Livros)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Titulo)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Isbn)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Lancamento)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Autor.NomeCompleto)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Titulo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Isbn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lancamento)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.QtdPaginas)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Autor.NomeCompleto)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

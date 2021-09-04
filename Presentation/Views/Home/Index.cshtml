@@ -1,8 +1,14 @@
-﻿@{
+﻿@model HomeEstatisticaViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>@Model.QtdLivrosCadastrados livros cadastrados</p>
+    <p>@Model.QtdAutoresCadastrados autores cadastrados</p>
+    <p>Autores tem em média @Model.MediaLivroPorAutor livros</p>
+    <p>Livros tem em média @Model.MediaPaginaPorLivro páginas</p>
+    <p>Maior livro tem @Model.QtdPaginasMaiorLivro páginas, escrito por @Model.AutorMaiorLivro</p>
+    <p>O autor @Model.AutorMaiorQtdLivros possuei a maior quantidade de livros, com @Model.MaiorQtdLivrosDeUmAutor exemplares</p>
 </div>

@@ -15,6 +15,7 @@ namespace Presentation.Models
         [DataType(DataType.Date)]
         [Display(Name = "Data de Lançamento")]
         public DateTime Lancamento { get; set; }
+        public int QtdPaginas { get; set; }
 
         [Required]
         public int AutorId { get; set; }

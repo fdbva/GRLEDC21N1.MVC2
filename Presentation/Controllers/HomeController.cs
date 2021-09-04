@@ -6,21 +6,28 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Presentation.Models;
+using Presentation.Services;
 
 namespace Presentation.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IEstatisticaHttpService _estatisticaHttpService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            ILogger<HomeController> logger,
+            IEstatisticaHttpService estatisticaHttpService)
         {
             _logger = logger;
+            _estatisticaHttpService = estatisticaHttpService;
         }
-
-        public IActionResult Index()
+        
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var homeEstatistica = await _estatisticaHttpService.GetAllAsync();
+
+            return View(homeEstatistica);
         }
 
         public IActionResult Privacy()
