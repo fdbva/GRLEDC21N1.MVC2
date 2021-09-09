@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Transactions;
 using Domain.Model.Interfaces.Repositories;
 using Domain.Model.Interfaces.Services;
 using Domain.Model.Models;
@@ -28,7 +29,16 @@ namespace Domain.Service.Services
 
         public async Task<LivroModel> CreateAsync(LivroModel livroModel)
         {
-            return await _livroRepository.CreateAsync(livroModel);
+            //exemplo de transaction feito manualmente
+            //using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            //var autor = await _autorService.CreateAsync(autorModel);
+            var livro = await _livroRepository.CreateAsync(livroModel);
+            //lógica xpto
+
+            //transactionScope.Complete();
+
+            return livro;
         }
 
         public async Task<LivroModel> EditAsync(LivroModel livroModel)

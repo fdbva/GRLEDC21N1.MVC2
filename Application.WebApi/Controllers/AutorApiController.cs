@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Model.Interfaces.Services;
+using Domain.Model.Interfaces.UoW;
 using Domain.Model.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +13,14 @@ namespace Application.WebApi.Controllers
     public class AutorApiController : ControllerBase
     {
         private readonly IAutorService _autorService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public AutorApiController(
-            IAutorService autorService)
+            IAutorService autorService,
+            IUnitOfWork unitOfWork)
         {
             _autorService = autorService;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet("{orderAscendant:bool}/{search?}")]
@@ -55,7 +59,9 @@ namespace Application.WebApi.Controllers
                 return BadRequest(autorModel);
             }
 
+            _unitOfWork.BeginTransaction();
             var autorCreated = await _autorService.CreateAsync(autorModel);
+            await _unitOfWork.CommitAsync();
 
             return Ok(autorCreated);
         }
@@ -75,7 +81,9 @@ namespace Application.WebApi.Controllers
 
             try
             {
+                _unitOfWork.BeginTransaction();
                 var autorEdited = await _autorService.EditAsync(autorModel);
+                await _unitOfWork.CommitAsync();
 
                 return Ok(autorEdited);
             }
@@ -94,7 +102,9 @@ namespace Application.WebApi.Controllers
                 return BadRequest();
             }
 
+            _unitOfWork.BeginTransaction();
             await _autorService.DeleteAsync(id);
+            await _unitOfWork.CommitAsync();
 
             return Ok();
         }

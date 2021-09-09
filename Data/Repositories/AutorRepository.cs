@@ -5,6 +5,7 @@ using Data.Data;
 using Domain.Model.Interfaces.Repositories;
 using Domain.Model.Models;
 using Microsoft.EntityFrameworkCore;
+using Z.EntityFramework.Plus;
 
 namespace Data.Repositories
 {
@@ -52,20 +53,21 @@ namespace Data.Repositories
 
         public async Task<AutorModel> GetByIdAsync(int id)
         {
-            var autorTask = _bibliotecaContext
+            //https://entityframework-plus.net/query-future
+            var autorFuture = _bibliotecaContext
                 .Autores
                 .Include(x => x.Livros)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .DeferredFirstOrDefault(x => x.Id == id)
+                .FutureValue();
 
-            var qtdLivrosTask = _bibliotecaContext.Livros.CountAsync(x => x.AutorId == id);
+            var qtdLivrosFuture = _bibliotecaContext
+                .Livros
+                .DeferredCount(x => x.AutorId == id)
+                .FutureValue();
 
-            await Task.WhenAll(autorTask, qtdLivrosTask);
-            //Também pode ser solucionado de maneira similar ao GetAll
-            //Fizemos durante a aula a outra maneira
+            var autor = await autorFuture.ValueAsync();
 
-            var autor = await autorTask;
-
-            autor.QuantidadeLivrosPublicados = await qtdLivrosTask;
+            autor.QuantidadeLivrosPublicados = await qtdLivrosFuture.ValueAsync();
 
             return autor;
         }
@@ -74,16 +76,12 @@ namespace Data.Repositories
         {
             var autor = _bibliotecaContext.Autores.Add(autorModel);
 
-            await _bibliotecaContext.SaveChangesAsync();
-
             return autor.Entity;
         }
 
         public async Task<AutorModel> EditAsync(AutorModel autorModel)
         {
             var autor = _bibliotecaContext.Autores.Update(autorModel);
-
-            await _bibliotecaContext.SaveChangesAsync();
 
             return autor.Entity;
         }
@@ -93,8 +91,6 @@ namespace Data.Repositories
             var autor = await GetByIdAsync(id);
 
             _bibliotecaContext.Autores.Remove(autor);
-
-            await _bibliotecaContext.SaveChangesAsync();
         }
     }
 }

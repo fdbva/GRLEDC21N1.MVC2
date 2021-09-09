@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Model.Interfaces.Services;
+using Domain.Model.Interfaces.UoW;
 using Domain.Model.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +16,14 @@ namespace Application.WebApi.Controllers
     public class LivroApiController : ControllerBase
     {
         private readonly ILivroService _livroService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public LivroApiController(
-            ILivroService livroService)
+            ILivroService livroService,
+            IUnitOfWork unitOfWork)
         {
             _livroService = livroService;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet("{orderAscendant:bool}/{search?}")]
@@ -59,7 +63,9 @@ namespace Application.WebApi.Controllers
                 return BadRequest(livroModel);
             }
 
+            _unitOfWork.BeginTransaction();
             var livroCreated = await _livroService.CreateAsync(livroModel);
+            await _unitOfWork.CommitAsync();
 
             return Ok(livroCreated);
         }
@@ -79,7 +85,9 @@ namespace Application.WebApi.Controllers
 
             try
             {
+                _unitOfWork.BeginTransaction();
                 var livroEdited = await _livroService.EditAsync(livroModel);
+                await _unitOfWork.CommitAsync();
 
                 return Ok(livroEdited);
             }
@@ -98,7 +106,9 @@ namespace Application.WebApi.Controllers
                 return BadRequest();
             }
 
+            _unitOfWork.BeginTransaction();
             await _livroService.DeleteAsync(id);
+            await _unitOfWork.CommitAsync();
 
             return Ok();
         }

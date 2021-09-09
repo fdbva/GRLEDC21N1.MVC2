@@ -51,16 +51,12 @@ namespace Data.Repositories
         {
             var livro = _bibliotecaContext.Livros.Add(livroModel);
 
-            await _bibliotecaContext.SaveChangesAsync();
-
             return livro.Entity;
         }
 
         public async Task<LivroModel> EditAsync(LivroModel livroModel)
         {
             var livro = _bibliotecaContext.Livros.Update(livroModel);
-
-            await _bibliotecaContext.SaveChangesAsync();
 
             return livro.Entity;
         }
@@ -70,8 +66,6 @@ namespace Data.Repositories
             var livro = await GetByIdAsync(id);
 
             _bibliotecaContext.Livros.Remove(livro);
-
-            await _bibliotecaContext.SaveChangesAsync();
         }
 
         public async Task<LivroModel> GetIsbnNotFromThisIdAsync(string isbn, int id)
