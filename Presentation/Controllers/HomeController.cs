@@ -1,31 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
+using Application.AppServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Presentation.Models;
-using Presentation.Services;
 
 namespace Presentation.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IEstatisticaHttpService _estatisticaHttpService;
+        private readonly IEstatisticaAppService _estatisticaAppService;
 
         public HomeController(
             ILogger<HomeController> logger,
-            IEstatisticaHttpService estatisticaHttpService)
+            IEstatisticaAppService estatisticaAppService)
         {
             _logger = logger;
-            _estatisticaHttpService = estatisticaHttpService;
+            _estatisticaAppService = estatisticaAppService;
         }
         
         public async Task<IActionResult> Index()
         {
-            var homeEstatistica = await _estatisticaHttpService.GetAllAsync();
+            var homeEstatistica = await _estatisticaAppService.GetHomeEstatisticaAsync();
 
             return View(homeEstatistica);
         }

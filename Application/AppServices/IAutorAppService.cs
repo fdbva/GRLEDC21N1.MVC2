@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Presentation.Models;
+using Application.ViewModels;
 
-namespace Presentation.Services
+namespace Application.AppServices
 {
-    public interface IAutorHttpService
+    public interface IAutorAppService
     {
         Task<IEnumerable<AutorViewModel>> GetAllAsync(
             bool orderAscendant,

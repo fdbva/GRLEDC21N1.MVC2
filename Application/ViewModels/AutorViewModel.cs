@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Presentation.Models
+namespace Application.ViewModels
 {
     public class AutorViewModel
     {

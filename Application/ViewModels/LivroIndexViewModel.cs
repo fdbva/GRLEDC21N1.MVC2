@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Presentation.Models
+namespace Application.ViewModels
 {
     public class LivroIndexViewModel
     {

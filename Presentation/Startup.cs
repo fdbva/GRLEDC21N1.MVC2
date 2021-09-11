@@ -1,11 +1,9 @@
-using System;
+using Crosscutting.IoC;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Presentation.Services;
-using Presentation.Services.Implementations;
 
 namespace Presentation
 {
@@ -33,16 +31,7 @@ namespace Presentation
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
                 });
 
-            var autorAddress = Configuration.GetValue<string>("ApiAddresses:Autor");
-            var livroAddress = Configuration.GetValue<string>("ApiAddresses:Livro");
-            var estatisticaAddress = Configuration.GetValue<string>("ApiAddresses:Estatistica");
-
-            services.AddHttpClient<IAutorHttpService, AutorHttpService>(x =>
-                x.BaseAddress = new Uri(autorAddress));
-            services.AddHttpClient<ILivroHttpService, LivroHttpService>(x =>
-                x.BaseAddress = new Uri(livroAddress));
-            services.AddHttpClient<IEstatisticaHttpService, EstatisticaHttpService>(x =>
-                x.BaseAddress = new Uri(estatisticaAddress));
+            services.RegisterServices(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

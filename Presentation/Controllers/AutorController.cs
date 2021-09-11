@@ -1,20 +1,19 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Application.AppServices;
+using Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Presentation.Models;
-using Presentation.Services;
 
 namespace Presentation.Controllers
 {
     public class AutorController : Controller
     {
-        private readonly IAutorHttpService _autorHttpService;
+        private readonly IAutorAppService _autorAppService;
 
         public AutorController(
-            IAutorHttpService autorHttpService)
+            IAutorAppService autorAppService)
         {
-            _autorHttpService = autorHttpService;
+            _autorAppService = autorAppService;
         }
 
         // GET: Autor
@@ -24,7 +23,7 @@ namespace Presentation.Controllers
             {
                 Search = autorIndexRequest.Search,
                 OrderAscendant = autorIndexRequest.OrderAscendant,
-                Autores = await _autorHttpService.GetAllAsync(
+                Autores = await _autorAppService.GetAllAsync(
                     autorIndexRequest.OrderAscendant,
                     autorIndexRequest.Search)
             };
@@ -40,7 +39,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorViewModel = await _autorHttpService.GetByIdAsync(id.Value);
+            var autorViewModel = await _autorAppService.GetByIdAsync(id.Value);
 
             if (autorViewModel == null)
             {
@@ -68,7 +67,7 @@ namespace Presentation.Controllers
                 return View(autorViewModel);
             }
 
-            var autorCreated = await _autorHttpService.CreateAsync(autorViewModel);
+            var autorCreated = await _autorAppService.CreateAsync(autorViewModel);
 
             return RedirectToAction(nameof(Details), new { id = autorCreated.Id });
         }
@@ -81,7 +80,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorViewModel = await _autorHttpService.GetByIdAsync(id.Value);
+            var autorViewModel = await _autorAppService.GetByIdAsync(id.Value);
             if (autorViewModel == null)
             {
                 return NotFound();
@@ -109,7 +108,7 @@ namespace Presentation.Controllers
 
             try
             {
-                await _autorHttpService.EditAsync(autorViewModel);
+                await _autorAppService.EditAsync(autorViewModel);
             }
             catch (DbUpdateConcurrencyException) //TODO: Tratamento de erro de banco deve ser feito no Repository
             {
@@ -134,7 +133,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var autorViewModel = await _autorHttpService.GetByIdAsync(id.Value);
+            var autorViewModel = await _autorAppService.GetByIdAsync(id.Value);
             if (autorViewModel == null)
             {
                 return NotFound();
@@ -148,14 +147,14 @@ namespace Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _autorHttpService.DeleteAsync(id);
+            await _autorAppService.DeleteAsync(id);
 
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> AutorModelExistsAsync(int id)
         {
-            var autor = await _autorHttpService.GetByIdAsync(id);
+            var autor = await _autorAppService.GetByIdAsync(id);
 
             var any = autor != null;
 
