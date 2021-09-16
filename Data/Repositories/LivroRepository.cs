@@ -8,17 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories
 {
-    public class LivroRepository : ILivroRepository
+    public class LivroRepository : BaseRepository<LivroModel>, ILivroRepository
     {
         private readonly BibliotecaContext _bibliotecaContext;
 
         public LivroRepository(
-            BibliotecaContext bibliotecaContext)
+            BibliotecaContext bibliotecaContext) : base(bibliotecaContext)
         {
             _bibliotecaContext = bibliotecaContext;
         }
 
-        public async Task<IEnumerable<LivroModel>> GetAllAsync(bool orderAscendant, string search = null)
+        public override async Task<IEnumerable<LivroModel>> GetAllAsync(bool orderAscendant, string search = null)
         {
             var livros = orderAscendant
                 ? _bibliotecaContext.Livros.OrderBy(x => x.Titulo)
@@ -37,7 +37,7 @@ namespace Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<LivroModel> GetByIdAsync(int id)
+        public override async Task<LivroModel> GetByIdAsync(int id)
         {
             var livro = await _bibliotecaContext
                 .Livros
@@ -45,27 +45,6 @@ namespace Data.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             return livro;
-        }
-
-        public async Task<LivroModel> CreateAsync(LivroModel livroModel)
-        {
-            var livro = _bibliotecaContext.Livros.Add(livroModel);
-
-            return livro.Entity;
-        }
-
-        public async Task<LivroModel> EditAsync(LivroModel livroModel)
-        {
-            var livro = _bibliotecaContext.Livros.Update(livroModel);
-
-            return livro.Entity;
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var livro = await GetByIdAsync(id);
-
-            _bibliotecaContext.Livros.Remove(livro);
         }
 
         public async Task<LivroModel> GetIsbnNotFromThisIdAsync(string isbn, int id)

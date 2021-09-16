@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace Domain.Model.Models
 {
-    public class AutorModel
+    public class AutorModel : BaseModel
     {
-        public int Id { get; set; }
         public string Nome { get; set; }
         public string UltimoNome { get; set; }
         public string Nacionalidade { get; set; }

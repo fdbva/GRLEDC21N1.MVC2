@@ -9,17 +9,17 @@ using Z.EntityFramework.Plus;
 
 namespace Data.Repositories
 {
-    public class AutorRepository : IAutorRepository
+    public class AutorRepository : BaseRepository<AutorModel>, IAutorRepository
     {
         private readonly BibliotecaContext _bibliotecaContext;
 
         public AutorRepository(
-            BibliotecaContext bibliotecaContext)
+            BibliotecaContext bibliotecaContext) : base(bibliotecaContext)
         {
             _bibliotecaContext = bibliotecaContext;
         }
 
-        public async Task<IEnumerable<AutorModel>> GetAllAsync(bool orderAscendant, string search = null)
+        public override async Task<IEnumerable<AutorModel>> GetAllAsync(bool orderAscendant, string search = null)
         {
             var autores = _bibliotecaContext.Autores.AsQueryable();
 
@@ -51,7 +51,7 @@ namespace Data.Repositories
             return autoresResult;
         }
 
-        public async Task<AutorModel> GetByIdAsync(int id)
+        public override async Task<AutorModel> GetByIdAsync(int id)
         {
             //https://entityframework-plus.net/query-future
             var autorFuture = _bibliotecaContext
@@ -70,27 +70,6 @@ namespace Data.Repositories
             autor.QuantidadeLivrosPublicados = await qtdLivrosFuture.ValueAsync();
 
             return autor;
-        }
-
-        public async Task<AutorModel> CreateAsync(AutorModel autorModel)
-        {
-            var autor = _bibliotecaContext.Autores.Add(autorModel);
-
-            return autor.Entity;
-        }
-
-        public async Task<AutorModel> EditAsync(AutorModel autorModel)
-        {
-            var autor = _bibliotecaContext.Autores.Update(autorModel);
-
-            return autor.Entity;
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var autor = await GetByIdAsync(id);
-
-            _bibliotecaContext.Autores.Remove(autor);
         }
     }
 }
