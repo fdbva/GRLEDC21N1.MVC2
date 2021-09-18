@@ -5,9 +5,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.ViewModels
 {
-    public class AutorViewModel
+    public class AutorViewModel : BaseViewModel
     {
-        public int Id { get; set; }
         [Required]
         [StringLength(150)]
         public string Nome { get; set; }

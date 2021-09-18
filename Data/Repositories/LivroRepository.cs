@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories
 {
-    public class LivroRepository : BaseRepository<LivroModel>, ILivroRepository
+    public class LivroRepository : CrudRepository<LivroModel>, ILivroRepository
     {
         private readonly BibliotecaContext _bibliotecaContext;
 

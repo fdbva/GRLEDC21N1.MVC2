@@ -9,7 +9,7 @@ using Z.EntityFramework.Plus;
 
 namespace Data.Repositories
 {
-    public class AutorRepository : BaseRepository<AutorModel>, IAutorRepository
+    public class AutorRepository : CrudRepository<AutorModel>, IAutorRepository
     {
         private readonly BibliotecaContext _bibliotecaContext;
 

@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories
 {
-    public class BaseRepository<TModel> : IBaseRepository<TModel>
+    public class CrudRepository<TModel> : ICrudRepository<TModel>
         where TModel : BaseModel
     {
         private readonly BibliotecaContext _bibliotecaContext;
         private readonly DbSet<TModel> _dbSet;
 
-        public BaseRepository(
+        public CrudRepository(
             BibliotecaContext bibliotecaContext)
         {
             _bibliotecaContext = bibliotecaContext;

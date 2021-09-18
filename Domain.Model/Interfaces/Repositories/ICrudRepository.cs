@@ -4,7 +4,7 @@ using Domain.Model.Models;
 
 namespace Domain.Model.Interfaces.Repositories
 {
-    public interface IBaseRepository<TModel>
+    public interface ICrudRepository<TModel>
         where TModel : BaseModel
     {
         Task<IEnumerable<TModel>> GetAllAsync(

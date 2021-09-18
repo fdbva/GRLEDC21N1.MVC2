@@ -3,11 +3,10 @@ using Application.AppServices;
 using Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace Presentation.Controllers
 {
-    public class LivroController : Controller
+    public class LivroController : CrudController<LivroViewModel>
     {
         private readonly ILivroAppService _livroAppService;
         private readonly IAutorAppService _autorAppService;
@@ -15,6 +14,7 @@ namespace Presentation.Controllers
         public LivroController(
             ILivroAppService livroAppService,
             IAutorAppService autorAppService)
+            : base (livroAppService)
         {
             _livroAppService = livroAppService;
             _autorAppService = autorAppService;
@@ -35,51 +35,22 @@ namespace Presentation.Controllers
             return View(livroIndexViewModel);
         }
 
-        // GET: Livro/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var livroViewModel = await _livroAppService.GetByIdAsync(id.Value);
-
-            if (livroViewModel == null)
-            {
-                return NotFound();
-            }
-
-            return View(livroViewModel);
-        }
-
-        // GET: Livro/Create
-        public async Task<IActionResult> Create()
-        {
-            await PreencherSelectAutores();
-
-            return View();
-        }
-
         // POST: Livro/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(LivroViewModel livroViewModel)
+        public override async Task<IActionResult> Create(LivroViewModel livroViewModel)
         {
             if (!ModelState.IsValid)
             {
-                await PreencherSelectAutores(livroViewModel.AutorId);
-                return View(livroViewModel);
+                await PreencherSelect(livroViewModel.AutorId);
             }
 
-            var livroCreated = await _livroAppService.CreateAsync(livroViewModel);
-
-            return RedirectToAction(nameof(Details), new { id = livroCreated.Id });
+            return await base.Create(livroViewModel);
         }
 
-        private async Task PreencherSelectAutores(int? autorId = null)
+        protected override async Task PreencherSelect(int? autorId = null)
         {
             var autores = await _autorAppService.GetAllAsync(true);
 
@@ -91,7 +62,7 @@ namespace Presentation.Controllers
         }
 
         // GET: Livro/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public override async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -104,7 +75,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            await PreencherSelectAutores(livroViewModel.AutorId);
+            await PreencherSelect(livroViewModel.AutorId);
 
             return View(livroViewModel);
         }
@@ -116,71 +87,12 @@ namespace Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, LivroViewModel livroViewModel)
         {
-            if (id != livroViewModel.Id)
-            {
-                return NotFound();
-            }
-
             if (!ModelState.IsValid)
             {
-                await PreencherSelectAutores(livroViewModel.AutorId);
-
-                return View(livroViewModel);
+                await PreencherSelect(livroViewModel.AutorId);
             }
 
-            try
-            {
-                await _livroAppService.EditAsync(livroViewModel);
-            }
-            catch (DbUpdateConcurrencyException) //TODO: Tratamento de erro de banco deve ser feito no Repository
-            {
-                var exists = await LivroViewModelExistsAsync(livroViewModel.Id);
-                if (!exists)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction(nameof(Index));
-        }
-
-        // GET: Livro/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var livroViewModel = await _livroAppService.GetByIdAsync(id.Value);
-            if (livroViewModel == null)
-            {
-                return NotFound();
-            }
-
-            return View(livroViewModel);
-        }
-
-        // POST: Livro/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _livroAppService.DeleteAsync(id);
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        private async Task<bool> LivroViewModelExistsAsync(int id)
-        {
-            var livro = await _livroAppService.GetByIdAsync(id);
-
-            var any = livro != null;
-
-            return any;
+            return await base.Edit(id, livroViewModel);
         }
 
         [AcceptVerbs("GET", "POST")]

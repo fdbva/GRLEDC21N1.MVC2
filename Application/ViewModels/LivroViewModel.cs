@@ -4,9 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Application.ViewModels
 {
-    public class LivroViewModel
+    public class LivroViewModel : BaseViewModel
     {
-        public int Id { get; set; }
         [StringLength(150)]
         public string Titulo { get; set; }
         [StringLength(maximumLength: 13, MinimumLength = 3)]
