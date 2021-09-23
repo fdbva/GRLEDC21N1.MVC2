@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Data.Data;
 using Domain.Model.Interfaces.Repositories;
@@ -19,36 +18,26 @@ namespace Data.Repositories
             _bibliotecaContext = bibliotecaContext;
         }
 
-        public override async Task<IEnumerable<AutorModel>> GetAllAsync(bool orderAscendant, string search = null)
+        public override async Task<IQueryable<AutorModel>> GetAllAsync()
         {
             var autores = _bibliotecaContext.Autores.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                autores = autores
-                    .Where(x => x.Nome.Contains(search) || x.UltimoNome.Contains(search));
-            }
+            //var result = autores
+            //    .Select(x => new
+            //    {
+            //        Autor = x,
+            //        QtdLivros = x.Livros.Count
+            //    })
+            //    .AsQueryable();
 
-            autores = orderAscendant
-                ? autores.OrderBy(x => x.Nome)
-                : autores.OrderByDescending(x => x.Nome);
+            //var autoresResult = result
+            //    .Select(x =>
+            //    {
+            //        x.Autor.QuantidadeLivrosPublicados = x.QtdLivros;
+            //        return x.Autor;
+            //    });
 
-            var result = await autores
-                .Select(x => new
-                {
-                    Autor = x,
-                    QtdLivros = x.Livros.Count
-                })
-                .ToListAsync();
-
-            var autoresResult = result
-                .Select(x =>
-                {
-                    x.Autor.QuantidadeLivrosPublicados = x.QtdLivros;
-                    return x.Autor;
-                });
-
-            return autoresResult;
+            return autores;
         }
 
         public override async Task<AutorModel> GetByIdAsync(int id)

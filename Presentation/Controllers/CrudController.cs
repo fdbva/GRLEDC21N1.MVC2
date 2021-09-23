@@ -10,12 +10,12 @@ namespace Presentation.Controllers
     public abstract class CrudController<TViewModel> : Controller
         where TViewModel : BaseViewModel
     {
-        private readonly ICrudAppService<TViewModel> _crudAppService;
+        protected readonly ICrudAppService<TViewModel> CrudAppService;
 
         protected CrudController(
             ICrudAppService<TViewModel> crudAppService)
         {
-            _crudAppService = crudAppService;
+            CrudAppService = crudAppService;
         }
 
         public virtual async Task<IActionResult> Details(int? id)
@@ -25,7 +25,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var viewModel = await _crudAppService.GetByIdAsync(id.Value);
+            var viewModel = await CrudAppService.GetByIdAsync(id.Value);
 
             if (viewModel == null)
             {
@@ -55,7 +55,7 @@ namespace Presentation.Controllers
                 return View(viewModel);
             }
 
-            var viewModelCreated = await _crudAppService.CreateAsync(viewModel);
+            var viewModelCreated = await CrudAppService.CreateAsync(viewModel);
 
             return RedirectToAction(nameof(Details), new { id = viewModelCreated.Id });
         }
@@ -67,7 +67,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var viewModel = await _crudAppService.GetByIdAsync(id.Value);
+            var viewModel = await CrudAppService.GetByIdAsync(id.Value);
             if (viewModel == null)
             {
                 return NotFound();
@@ -94,7 +94,7 @@ namespace Presentation.Controllers
 
             try
             {
-                await _crudAppService.EditAsync(viewModel);
+                await CrudAppService.EditAsync(viewModel);
             }
             catch (DbUpdateConcurrencyException) //TODO: Tratamento de erro de banco deve ser feito no Repository
             {
@@ -118,7 +118,7 @@ namespace Presentation.Controllers
                 return NotFound();
             }
 
-            var viewModel = await _crudAppService.GetByIdAsync(id.Value);
+            var viewModel = await CrudAppService.GetByIdAsync(id.Value);
             if (viewModel == null)
             {
                 return NotFound();
@@ -131,14 +131,14 @@ namespace Presentation.Controllers
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _crudAppService.DeleteAsync(id);
+            await CrudAppService.DeleteAsync(id);
 
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> ModelExistsAsync(int id)
         {
-            var viewModel = await _crudAppService.GetByIdAsync(id);
+            var viewModel = await CrudAppService.GetByIdAsync(id);
 
             var any = viewModel != null;
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Data.Data;
 using Domain.Model.Interfaces.Repositories;
@@ -24,7 +21,7 @@ namespace Data.Repositories
             _dbSet = _bibliotecaContext.Set<TModel>();
         }
 
-        public virtual async Task<IEnumerable<TModel>> GetAllAsync(bool orderAscendant, string search = null)
+        public virtual async Task<IQueryable<TModel>> GetAllAsync()
         {
             return _dbSet;
         }

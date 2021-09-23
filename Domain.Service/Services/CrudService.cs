@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Domain.Model.Interfaces.Repositories;
 using Domain.Model.Interfaces.Services;
@@ -17,9 +18,9 @@ namespace Domain.Service.Services
             _crudRepository = crudRepository;
         }
 
-        public virtual async Task<IEnumerable<TModel>> GetAllAsync(bool orderAscendant, string search = null)
+        public virtual async Task<IQueryable<TModel>> GetAllAsync()
         {
-            return await _crudRepository.GetAllAsync(orderAscendant, search);
+            return await _crudRepository.GetAllAsync();
         }
 
         public virtual async Task<TModel> GetByIdAsync(int id)

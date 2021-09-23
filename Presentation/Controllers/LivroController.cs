@@ -3,10 +3,11 @@ using Application.AppServices;
 using Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NonFactors.Mvc.Grid;
 
 namespace Presentation.Controllers
 {
-    public class LivroController : CrudController<LivroViewModel>
+    public class LivroController : GridController<LivroViewModel>
     {
         private readonly ILivroAppService _livroAppService;
         private readonly IAutorAppService _autorAppService;
@@ -18,21 +19,6 @@ namespace Presentation.Controllers
         {
             _livroAppService = livroAppService;
             _autorAppService = autorAppService;
-        }
-
-        // GET: Livro
-        public async Task<IActionResult> Index(
-            LivroIndexViewModel livroIndexRequest)
-        {
-            var livroIndexViewModel = new LivroIndexViewModel
-            {
-                Search = livroIndexRequest.Search,
-                OrderAscendant = livroIndexRequest.OrderAscendant,
-                Livros = await _livroAppService.GetAllAsync(
-                    livroIndexRequest.OrderAscendant,
-                    livroIndexRequest.Search)
-            };
-            return View(livroIndexViewModel);
         }
 
         // POST: Livro/Create
@@ -52,7 +38,7 @@ namespace Presentation.Controllers
 
         protected override async Task PreencherSelect(int? autorId = null)
         {
-            var autores = await _autorAppService.GetAllAsync(true);
+            var autores = await _autorAppService.GetAllAsync();
 
             ViewBag.Autores = new SelectList(
                 autores,
@@ -101,6 +87,15 @@ namespace Presentation.Controllers
             return await _livroAppService.IsIsbnValidAsync(isbn, id) 
                 ? Json(true)
                 : Json($"ISBN {isbn} já está sendo usado.");
+        }
+
+        protected override void ConfigureGridColumns(IGrid<LivroViewModel> grid)
+        {
+            grid.Columns.Add(model => model.Titulo);
+            grid.Columns.Add(model => model.Isbn);
+            grid.Columns.Add(model => model.Lancamento);
+            grid.Columns.Add(model => model.QtdPaginas);
+            grid.Columns.Add(model => model.Autor.NomeCompleto);
         }
     }
 }

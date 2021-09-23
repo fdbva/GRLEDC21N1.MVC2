@@ -1,35 +1,23 @@
-﻿using System.Threading.Tasks;
-using Application.AppServices;
+﻿using Application.AppServices;
 using Application.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using NonFactors.Mvc.Grid;
 
 namespace Presentation.Controllers
 {
-    public class AutorController : CrudController<AutorViewModel>
+    public class AutorController : GridController<AutorViewModel>
     {
-        private readonly IAutorAppService _autorAppService;
-
         public AutorController(
             IAutorAppService autorAppService)
             : base(autorAppService)
         {
-            _autorAppService = autorAppService;
         }
 
-        // GET: Autor
-        public async Task<IActionResult> Index(AutorIndexViewModel autorIndexRequest)
+        protected override void ConfigureGridColumns(IGrid<AutorViewModel> grid)
         {
-            var autorIndexViewModel = new AutorIndexViewModel
-            {
-                Search = autorIndexRequest.Search,
-                OrderAscendant = autorIndexRequest.OrderAscendant,
-                Autores = await _autorAppService.GetAllAsync(
-                    autorIndexRequest.OrderAscendant,
-                    autorIndexRequest.Search)
-            };
-
-            return View(autorIndexViewModel);
+            grid.Columns.Add(model => model.Nome);
+            grid.Columns.Add(model => model.UltimoNome);
+            grid.Columns.Add(model => model.Nacionalidade);
+            grid.Columns.Add(model => model.Nascimento);
         }
     }
 }

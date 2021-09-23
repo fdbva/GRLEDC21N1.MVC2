@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Data.Data;
 using Domain.Model.Interfaces.Repositories;
@@ -18,23 +17,12 @@ namespace Data.Repositories
             _bibliotecaContext = bibliotecaContext;
         }
 
-        public override async Task<IEnumerable<LivroModel>> GetAllAsync(bool orderAscendant, string search = null)
+        public override async Task<IQueryable<LivroModel>> GetAllAsync()
         {
-            var livros = orderAscendant
-                ? _bibliotecaContext.Livros.OrderBy(x => x.Titulo)
-                : _bibliotecaContext.Livros.OrderByDescending(x => x.Titulo);
-
-            if (string.IsNullOrWhiteSpace(search))
-            {
-                return await livros
-                    .Include(x => x.Autor)
-                    .ToListAsync();
-            }
-
-            return await livros
+            return _bibliotecaContext
+                .Livros
                 .Include(x => x.Autor)
-                .Where(x => x.Titulo.Contains(search))
-                .ToListAsync();
+                .AsQueryable();
         }
 
         public override async Task<LivroModel> GetByIdAsync(int id)

@@ -1,81 +1,12 @@
-﻿@using System.Linq
-@model AutorIndexViewModel
+﻿@model IGrid<AutorViewModel>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Search</h1>
-<form asp-action="Index">
-    <label>Busca:</label>
-    <input type="text" asp-for="@Model.Search" />
-    <br />
-    <label>Ordenação por Nome:</label>
-    <select asp-for="OrderAscendant">
-        <option value="@true">Ascendente</option>
-        <option value="@false">Descendente</option>
-    </select>
-    <br />
-    <button>go!</button>
-</form>
-
+<h1>Autores</h1>
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-
-@{
-    if (Model.Autores == null || !Model.Autores.Any())
-    {
-        <p>Nenhum Autor cadastrado :(</p>
-        return;
-    }
-}
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Autores.First().Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Autores.First().UltimoNome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Autores.First().Nacionalidade)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Autores.First().QuantidadeLivrosPublicados)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Autores.First().Nascimento)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Autores)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Nome)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UltimoNome)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Nacionalidade)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.QuantidadeLivrosPublicados)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Nascimento)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<a href="@(Url.Action("ExportIndex") + ViewContext.HttpContext.Request.QueryString)">Export</a>
+@(new HtmlGrid<AutorViewModel>(Html, Model))

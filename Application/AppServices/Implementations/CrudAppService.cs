@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Application.ViewModels;
 using AutoMapper;
@@ -26,11 +26,11 @@ namespace Application.AppServices.Implementations
             _unitOfWork = unitOfWork;
         }
 
-        public virtual async Task<IEnumerable<TViewModel>> GetAllAsync(bool orderAscendant, string search = null)
+        public virtual async Task<IQueryable<TViewModel>> GetAllAsync()
         {
-            var models = await _crudService.GetAllAsync(orderAscendant, search);
+            var models = await _crudService.GetAllAsync();
 
-            return _mapper.Map<IEnumerable<TViewModel>>(models);
+            return _mapper.ProjectTo<TViewModel>(models);
         }
 
         public virtual async Task<TViewModel> GetByIdAsync(int id)
