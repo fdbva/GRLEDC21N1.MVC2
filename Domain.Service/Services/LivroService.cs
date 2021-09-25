@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Domain.Model.Interfaces.Repositories;
 using Domain.Model.Interfaces.Services;
 using Domain.Model.Models;
@@ -9,33 +8,29 @@ namespace Domain.Service.Services
     public class LivroService : CrudService<LivroModel>, ILivroService
     {
         private readonly ILivroRepository _livroRepository;
+        private readonly IIsbnValidator _isbnValidator;
 
         public LivroService(
-            ILivroRepository livroRepository) : base(livroRepository)
+            ILivroRepository livroRepository,
+            IIsbnValidator isbnValidator) : base(livroRepository)
         {
             _livroRepository = livroRepository;
+            _isbnValidator = isbnValidator;
         }
 
         public async Task<bool> IsIsbnValidAsync(string isbn, int id)
         {
-            if (string.IsNullOrWhiteSpace(isbn))
+            var isIsbnValid = _isbnValidator.Validate(isbn);
+            if (!isIsbnValid)
             {
                 return false;
             }
 
             var livroModel = await _livroRepository.GetIsbnNotFromThisIdAsync(isbn, id);
 
-            var digits = isbn.ToCharArray().Select(x => (int)x).ToArray();
-            int i, s = 0, t = 0;
+            var isbnNotRepeated = livroModel == null;
 
-            for (i = 0; i < 10; i++)
-            {
-                t += digits[i];
-                s += t;
-            }
-            var validIsbn = s % 11 == 0;
-
-            return livroModel == null && validIsbn;
+            return isbnNotRepeated;
         }
     }
 }

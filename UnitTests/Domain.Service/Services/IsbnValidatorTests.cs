@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Model.Interfaces.Repositories;
+using Domain.Model.Interfaces.Services;
 using Domain.Model.Models;
 using Domain.Service.Services;
 using NSubstitute;
@@ -13,32 +14,36 @@ namespace UnitTests.Domain.Service.Services
 {
     public class IsbnValidatorTests
     {
-        [Fact]
-        public async Task ValidIsbnShouldReturnTrue()
+        //978-0-306-40615-7
+        //9780306406157
+        [Theory]
+        [InlineData("0306406152")]
+        [InlineData("9780306406157")]
+        public void ValidIsbnShouldReturnTrue(string isbn)
         {
-            var livroRepository = Substitute.For<ILivroRepository>();
-            livroRepository
-                .GetIsbnNotFromThisIdAsync(default, default)
-                .ReturnsForAnyArgs((LivroModel)null);
+            var isbnValidator = new IsbnValidator();
 
-            var livroService = new LivroService(livroRepository);
-
-            var isIsbnValid = await livroService.IsIsbnValidAsync("0306406152", 3);
+            var isIsbnValid = isbnValidator.Validate(isbn);
 
             Assert.True(isIsbnValid);
         }
 
         [Fact]
-        public async Task InvalidIsbnShouldReturnFalse()
+        public void Valid10DigitIsbnShouldReturnTrue()
         {
-            var livroRepository = Substitute.For<ILivroRepository>();
-            livroRepository
-                .GetIsbnNotFromThisIdAsync(default, default)
-                .ReturnsForAnyArgs((LivroModel)null);
+            IIsbnValidator isbnValidator = new IsbnValidator();
 
-            var livroService = new LivroService(livroRepository);
+            var isIsbnValid = isbnValidator.Validate10Digits("0306406152");
 
-            var isIsbnValid = await livroService.IsIsbnValidAsync("0306406153", 3);
+            Assert.True(isIsbnValid);
+        }
+
+        [Fact]
+        public void Invalid10DigitIsbnShouldReturnFalse()
+        {
+            IIsbnValidator isbnValidator = new IsbnValidator();
+
+            var isIsbnValid = isbnValidator.Validate10Digits("0306406153");
 
             Assert.False(isIsbnValid);
         }
