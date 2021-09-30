@@ -1,37 +1,89 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Domain.Model.Interfaces.Services;
 
 namespace Domain.Service.Services
 {
     public class IsbnValidator : IIsbnValidator
     {
-        public bool Validate(string isbn)
-        {
-            return isbn.Length switch
-            {
-                10 => Validate10Digits(isbn),
-                13 => Validate13Digits(isbn),
-                _ => false
-            };
-        }
+        public const char ValidSeparator = '-';
 
-        public bool Validate10Digits(string isbn)
-        {
-            if (string.IsNullOrWhiteSpace(isbn))
+        public bool Validate(string isbn)
+        {//10, 13, 17
+            if (isbn.Length != 10 && isbn.Length != 13 && isbn.Length != 17)
             {
                 return false;
             }
 
-            var digits = isbn.ToCharArray().Select(x => (int)x).ToArray();
+            switch (isbn.Length)
+            {
+                case 10:
+                {
+                    var isDigit = isbn.All(isbnChar => char.IsDigit(isbnChar));
+
+                    if (!isDigit)
+                    {
+                        return false;
+                    }
+
+                    break;
+                }
+                case 17:
+                {
+                    var separatorsAtRightPosition =
+                        isbn[3] == ValidSeparator &&
+                        isbn[5] == ValidSeparator &&
+                        isbn[9] == ValidSeparator &&
+                        isbn[15] == ValidSeparator;
+                    if (!separatorsAtRightPosition)
+                    {
+                        return false;
+                    }
+
+                    break;
+                }
+                case 13:
+                {
+                    var isDigit = isbn.All(isbnChar => char.IsDigit(isbnChar));
+                    if (!isDigit)
+                    {
+                        var separatorsAtRightPosition =
+                            isbn[1] == ValidSeparator &&
+                            isbn[5] == ValidSeparator &&
+                            isbn[11] == ValidSeparator;
+                        if (!separatorsAtRightPosition)
+                        {
+                            return false;
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            var parsedIsbn = isbn
+                .Replace("-", string.Empty)
+                .ToCharArray().Select(x => (int)char.GetNumericValue(x)).ToArray();
+
+            return parsedIsbn.Length switch
+            {
+                10 => Validate10Digits(parsedIsbn),
+                13 => Validate13Digits(parsedIsbn),
+                _ => false
+            };
+        }
+
+        public virtual bool Validate10Digits(int[] isbnDigits)
+        {
+            if (isbnDigits.Length != 10)
+            {
+                return false;
+            }
+            
             int i, s = 0, t = 0;
 
             for (i = 0; i < 10; i++)
             {
-                t += digits[i];
+                t += isbnDigits[i];
                 s += t;
             }
 
@@ -42,8 +94,14 @@ namespace Domain.Service.Services
             return validIsbn;
         }
 
-        public bool Validate13Digits(string isbn)
+        //TODO: finalizar lógica
+        public virtual bool Validate13Digits(int[] isbnDigits)
         {
+            if (isbnDigits.Length != 13)
+            {
+                return false;
+            }
+
             return false;
         }
     }
